@@ -1,56 +1,72 @@
 <template>
-  <ion-page>
-    <ion-header :translucent="true">
-      <ion-toolbar>
-        <ion-title>Blank</ion-title>
-      </ion-toolbar>
-    </ion-header>
-
-    <ion-content :fullscreen="true">
-      <ion-header collapse="condense">
+  <ion-header>
+    <ion-toolbar>
+      <ion-title>Inline Modal</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content class="ion-padding">
+    <ion-button id="open-modal" expand="block">Open</ion-button>
+    <p>{{ message }}</p>
+    <ion-modal ref="modal" trigger="open-modal" @willDismiss="onWillDismiss">
+      <ion-header>
         <ion-toolbar>
-          <ion-title size="large">Blank</ion-title>
+          <ion-buttons slot="start">
+            <ion-button @click="cancel()">Cancel</ion-button>
+          </ion-buttons>
+          <ion-title>Welcome</ion-title>
+          <ion-buttons slot="end">
+            <ion-button :strong="true" @click="confirm()">Confirm</ion-button>
+          </ion-buttons>
         </ion-toolbar>
       </ion-header>
-
-      <div id="container">
-        <strong>Ready to create an app?</strong>
-        <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
-      </div>
-    </ion-content>
-  </ion-page>
+      <ion-content class="ion-padding">
+        <ion-item>
+          <ion-col size="6">
+            <ion-select fill="outline" placeholder="Birth Month" interface="popover">
+              <ion-select-option v-for="(month, index) in months" :key="index" :value="index">
+                {{ month }}
+              </ion-select-option>
+            </ion-select>
+          </ion-col>
+        </ion-item>
+      </ion-content>
+    </ion-modal>
+  </ion-content>
 </template>
 
-<script setup lang="ts">
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
+<script lang="ts" setup>
+import {
+  IonButtons,
+  IonButton,
+  IonModal,
+  IonHeader,
+  IonContent,
+  IonToolbar,
+  IonTitle,
+  IonItem,
+  IonCol,
+  IonSelect,
+  IonSelectOption
+} from '@ionic/vue';
+import { OverlayEventDetail } from '@ionic/core/components';
+import { ref } from 'vue';
+
+const message = ref('This modal example uses triggers to automatically open a modal when the button is clicked.');
+
+const modal = ref();
+const input = ref();
+const months = [1, 2, 3, 4, 5];
+
+const cancel = () => modal.value.$el.dismiss(null, 'cancel');
+
+const confirm = () => {
+  const name = input.value.$el.value;
+  modal.value.$el.dismiss(name, 'confirm');
+};
+
+const onWillDismiss = (ev: CustomEvent<OverlayEventDetail>) => {
+  if (ev.detail.role === 'confirm') {
+    message.value = `Hello, ${ev.detail.data}!`;
+  }
+};
 </script>
-
-<style scoped>
-#container {
-  text-align: center;
-  
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-#container strong {
-  font-size: 20px;
-  line-height: 26px;
-}
-
-#container p {
-  font-size: 16px;
-  line-height: 22px;
-  
-  color: #8c8c8c;
-  
-  margin: 0;
-}
-
-#container a {
-  text-decoration: none;
-}
-</style>
